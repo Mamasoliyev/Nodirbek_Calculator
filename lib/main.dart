@@ -39,22 +39,31 @@ class _CalculatorState extends State<Calculator> {
       } else if (value == '=') {
         try {
           result = (evaluateExpression(input)).toString();
+          input = '';
         } catch (e) {
           result = 'Error';
         }
+      } else if ('+-×÷'.contains(value)) {
+        // Agar natija mavjud bo'lsa, uni ifodaga kiritish
+        if (result != '0' && input.isEmpty) {
+          input = result;
+        }
+        input += value;
       } else if (value == 'EE') {
-        // Agar oxirgi belgi operator bo'lmasa, 'e' qo'shish
         if (input.isNotEmpty && !_endsWithOperator(input)) {
           input += 'e'; // 'EE' matematik ifoda ichida `e` sifatida ishlatiladi
         }
       } else if (value == '0') {
-        // Ketma-ket 0 ni cheklash
         if (input.isEmpty || _endsWithOperator(input)) {
           input += '0';
         } else if (!input.endsWith('0') || input.contains('.')) {
           input += '0';
         }
       } else {
+        if (result != '0' && input.isEmpty) {
+          input = result;
+          result = '0'; // Yangi kirish natijadan keyin boshlansa, natijani tozalash
+        }
         input += value;
       }
     });
@@ -68,7 +77,7 @@ class _CalculatorState extends State<Calculator> {
 
   double evaluateExpression(String input) {
     try {
-      // Ilmiy notatsiyani to‘g‘ri ishlatish uchun '×' va '÷' ni almashtirish
+      // Ilmiy notatsiyani to'g'ri ishlatish uchun '×' va '÷' ni almashtirish
       String formattedInput = input
           .replaceAll('×', '*')
           .replaceAll('÷', '/')
